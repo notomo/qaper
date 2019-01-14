@@ -2,13 +2,11 @@ package server
 
 import (
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
 )
 
-func (s *Server) paper(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
+func (s *Server) paper(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	client := &Client{ID: "0"}
 	s.Add(client)
 

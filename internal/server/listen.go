@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 // Server represents a server
@@ -57,10 +59,10 @@ func responseJSON(w http.ResponseWriter, v interface{}) {
 
 // Listen starts listening a port.
 func (s *Server) Listen() error {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/paper", s.paper)
+	router := httprouter.New()
+	router.POST("/paper", s.paper)
 
-	server := &http.Server{Addr: ":" + s.Port, Handler: mux}
+	server := &http.Server{Addr: ":" + s.Port, Handler: router}
 	go func() {
 		log.Println("Listen: " + s.Port)
 		server.ListenAndServe()
