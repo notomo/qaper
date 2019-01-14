@@ -33,17 +33,26 @@ func run(args []string, inputReader io.Reader, outWriter io.Writer) error {
 }
 
 func parseCommand(args []string, inputReader io.Reader, outWriter io.Writer) (cmd.Command, error) {
+	join := flag.NewFlagSet("join", flag.ExitOnError)
+	joinPort := join.String("port", "9090", "port number")
+
 	question := flag.NewFlagSet("question", flag.ExitOnError)
 	answer := flag.NewFlagSet("answer", flag.ExitOnError)
 	judge := flag.NewFlagSet("judge", flag.ExitOnError)
+
 	server := flag.NewFlagSet("server", flag.ExitOnError)
-	port := server.String("port", "9090", "port number")
+	serverPort := server.String("port", "9090", "port number")
 
 	if len(args) == 0 {
 		return &cmd.HelpCommand{OutWriter: outWriter}, nil
 	}
 
 	switch args[0] {
+	case "join":
+		if err := join.Parse(args[1:]); err != nil {
+			return nil, err
+		}
+		return &cmd.JoinCommand{OutWriter: outWriter, Port: *joinPort}, nil
 	case "question":
 		if err := question.Parse(args[1:]); err != nil {
 			return nil, err
@@ -63,7 +72,7 @@ func parseCommand(args []string, inputReader io.Reader, outWriter io.Writer) (cm
 		if err := server.Parse(args[1:]); err != nil {
 			return nil, err
 		}
-		return &cmd.ServerCommand{OutWriter: outWriter, Port: *port}, nil
+		return &cmd.ServerCommand{OutWriter: outWriter, Port: *serverPort}, nil
 	default:
 		return nil, fmt.Errorf("Not found command: %v", args[0])
 	}
