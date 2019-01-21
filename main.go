@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/notomo/qaper/internal/cmd"
+	"github.com/notomo/qaper/internal/datastore"
 )
 
 func main() {
@@ -52,7 +53,9 @@ func parseCommand(args []string, inputReader io.Reader, outWriter io.Writer) (cm
 		if err := join.Parse(args[1:]); err != nil {
 			return nil, err
 		}
-		return &cmd.JoinCommand{OutWriter: outWriter, Port: *joinPort}, nil
+
+		paperRepository := &datastore.PaperRepositoryImpl{Port: *joinPort}
+		return &cmd.JoinCommand{OutWriter: outWriter, PaperRepository: paperRepository}, nil
 	case "question":
 		if err := question.Parse(args[1:]); err != nil {
 			return nil, err
