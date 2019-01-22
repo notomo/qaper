@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -24,18 +25,24 @@ func (repo *PaperRepositoryImpl) Add() (model.Paper, error) {
 
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
 
-	paper := &PaperImpl{id: string(body)}
+	var paper *PaperImpl
+	if err := json.Unmarshal(body, paper); err != nil {
+		return nil, err
+	}
 
 	return paper, nil
 }
 
 // PaperImpl implements paper
 type PaperImpl struct {
-	id string
+	PaperID string `json:"id"`
 }
 
 // ID returns an id
 func (p *PaperImpl) ID() string {
-	return p.id
+	return p.PaperID
 }
