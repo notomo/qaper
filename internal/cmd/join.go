@@ -9,7 +9,6 @@ import (
 // JoinCommand represents `join` command
 type JoinCommand struct {
 	OutWriter       io.Writer
-	Port            string
 	PaperRepository repository.PaperRepository
 }
 
