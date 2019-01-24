@@ -26,11 +26,7 @@ func run(args []string, inputReader io.Reader, outWriter io.Writer) error {
 		return err
 	}
 
-	if err := command.Run(); err != nil {
-		return err
-	}
-
-	return nil
+	return command.Run()
 }
 
 func parseCommand(args []string, inputReader io.Reader, outWriter io.Writer) (cmd.Command, error) {
