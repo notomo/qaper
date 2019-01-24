@@ -29,12 +29,12 @@ func (repo *PaperRepositoryImpl) Add() (model.Paper, error) {
 		return nil, err
 	}
 
-	var paper *PaperImpl
-	if err := json.Unmarshal(body, paper); err != nil {
+	var paper PaperImpl
+	if err := json.Unmarshal(body, &paper); err != nil {
 		return nil, err
 	}
 
-	return paper, nil
+	return &paper, nil
 }
 
 // PaperImpl implements paper
