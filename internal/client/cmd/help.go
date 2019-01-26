@@ -7,12 +7,12 @@ import (
 
 // HelpCommand represents `help` command
 type HelpCommand struct {
-	OutWriter io.Writer
+	OutputWriter io.Writer
 }
 
 // Run `help` command
 func (c *HelpCommand) Run() error {
-	flag.CommandLine.SetOutput(c.OutWriter)
+	flag.CommandLine.SetOutput(c.OutputWriter)
 	flag.Usage()
 	return nil
 }

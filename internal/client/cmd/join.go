@@ -8,7 +8,7 @@ import (
 
 // JoinCommand represents `join` command
 type JoinCommand struct {
-	OutWriter       io.Writer
+	OutputWriter    io.Writer
 	PaperRepository repository.PaperRepository
 }
 
@@ -19,7 +19,7 @@ func (c *JoinCommand) Run() error {
 		return err
 	}
 
-	c.OutWriter.Write([]byte(paper.ID()))
+	c.OutputWriter.Write([]byte(paper.ID()))
 
 	return nil
 }

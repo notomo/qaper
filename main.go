@@ -7,9 +7,13 @@ import (
 	"log"
 	"os"
 
-	"github.com/notomo/qaper/internal/cmd"
-	"github.com/notomo/qaper/internal/datastore"
+	"github.com/notomo/qaper/internal/client/cmd"
+	client "github.com/notomo/qaper/internal/client/datastore"
+	"github.com/notomo/qaper/internal/server/api/controller"
+	server "github.com/notomo/qaper/internal/server/datastore"
 )
+
+var defaultPort = "9090"
 
 func main() {
 	flag.Parse()
@@ -20,8 +24,8 @@ func main() {
 	}
 }
 
-func run(args []string, inputReader io.Reader, outWriter io.Writer) error {
-	command, err := parseCommand(args, inputReader, outWriter)
+func run(args []string, inputReader io.Reader, outputWriter io.Writer) error {
+	command, err := parseCommand(args, inputReader, outputWriter)
 	if err != nil {
 		return err
 	}
@@ -29,50 +33,45 @@ func run(args []string, inputReader io.Reader, outWriter io.Writer) error {
 	return command.Run()
 }
 
-func parseCommand(args []string, inputReader io.Reader, outWriter io.Writer) (cmd.Command, error) {
-	join := flag.NewFlagSet("join", flag.ExitOnError)
-	joinPort := join.String("port", "9090", "port number")
+func parseCommand(args []string, inputReader io.Reader, outputWriter io.Writer) (cmd.Command, error) {
+	joinFlag := flag.NewFlagSet("join", flag.ExitOnError)
+	joinPort := joinFlag.String("port", defaultPort, "port number")
 
-	question := flag.NewFlagSet("question", flag.ExitOnError)
-	answer := flag.NewFlagSet("answer", flag.ExitOnError)
-	judge := flag.NewFlagSet("judge", flag.ExitOnError)
-
-	server := flag.NewFlagSet("server", flag.ExitOnError)
-	serverPort := server.String("port", "9090", "port number")
+	serverFlag := flag.NewFlagSet("server", flag.ExitOnError)
+	serverPort := serverFlag.String("port", defaultPort, "port number")
 
 	if len(args) == 0 {
-		return &cmd.HelpCommand{OutWriter: outWriter}, nil
+		return &cmd.HelpCommand{OutputWriter: outputWriter}, nil
 	}
 
+	var command cmd.Command
 	switch args[0] {
 	case "join":
-		if err := join.Parse(args[1:]); err != nil {
+		if err := joinFlag.Parse(args[1:]); err != nil {
 			return nil, err
 		}
-
-		paperRepository := &datastore.PaperRepositoryImpl{Port: *joinPort}
-		return &cmd.JoinCommand{OutWriter: outWriter, PaperRepository: paperRepository}, nil
-	case "question":
-		if err := question.Parse(args[1:]); err != nil {
-			return nil, err
+		command = &cmd.JoinCommand{
+			OutputWriter:    outputWriter,
+			PaperRepository: &client.PaperRepositoryImpl{Port: *joinPort},
 		}
-		return &cmd.QuestionCommand{OutWriter: outWriter}, nil
-	case "answer":
-		if err := answer.Parse(args[1:]); err != nil {
-			return nil, err
-		}
-		return &cmd.AnswerCommand{InputReader: inputReader}, nil
-	case "judge":
-		if err := judge.Parse(args[1:]); err != nil {
-			return nil, err
-		}
-		return &cmd.JudgeCommand{OutWriter: outWriter}, nil
 	case "server":
-		if err := server.Parse(args[1:]); err != nil {
+		if err := serverFlag.Parse(args[1:]); err != nil {
 			return nil, err
 		}
-		return &cmd.ServerCommand{OutWriter: outWriter, Port: *serverPort}, nil
+		processor := server.NewProcessor()
+		command = &cmd.ServerCommand{
+			OutputWriter: outputWriter,
+			Port:         *serverPort,
+			Processor:    processor,
+			PaperController: controller.PaperController{
+				PaperRepository: &server.PaperRepositoryImpl{
+					Processor: processor,
+				},
+			},
+		}
 	default:
 		return nil, fmt.Errorf("Not found command: %v", args[0])
 	}
+
+	return command, nil
 }
