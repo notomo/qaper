@@ -10,11 +10,12 @@ import (
 type JoinCommand struct {
 	OutputWriter    io.Writer
 	PaperRepository repository.PaperRepository
+	BookID          string
 }
 
 // Run `join` command
 func (c *JoinCommand) Run() error {
-	paper, err := c.PaperRepository.Add()
+	paper, err := c.PaperRepository.Add(c.BookID)
 	if err != nil {
 		return err
 	}

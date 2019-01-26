@@ -7,7 +7,7 @@ start:
 	./dist/qaper server
 
 test:
-	go run main.go join
+	go run main.go join -bookid=1
 
 format:
 	go fmt $(go list ./... | grep -v /vendor/)

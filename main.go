@@ -36,6 +36,7 @@ func run(args []string, inputReader io.Reader, outputWriter io.Writer) error {
 func parseCommand(args []string, inputReader io.Reader, outputWriter io.Writer) (cmd.Command, error) {
 	joinFlag := flag.NewFlagSet("join", flag.ExitOnError)
 	joinPort := joinFlag.String("port", defaultPort, "port number")
+	bookID := joinFlag.String("bookid", "", "book id")
 
 	serverFlag := flag.NewFlagSet("server", flag.ExitOnError)
 	serverPort := serverFlag.String("port", defaultPort, "port number")
@@ -53,6 +54,7 @@ func parseCommand(args []string, inputReader io.Reader, outputWriter io.Writer) 
 		command = &cmd.JoinCommand{
 			OutputWriter:    outputWriter,
 			PaperRepository: &client.PaperRepositoryImpl{Port: *joinPort},
+			BookID:          *bookID,
 		}
 	case "server":
 		if err := serverFlag.Parse(args[1:]); err != nil {
@@ -66,6 +68,9 @@ func parseCommand(args []string, inputReader io.Reader, outputWriter io.Writer) 
 			PaperController: controller.PaperController{
 				PaperRepository: &server.PaperRepositoryImpl{
 					Processor: processor,
+					BookRepository: &server.BookRepositoryImpl{
+						Processor: processor,
+					},
 				},
 			},
 		}

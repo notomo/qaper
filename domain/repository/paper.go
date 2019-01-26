@@ -6,5 +6,5 @@ import (
 
 // PaperRepository provides paper operations.
 type PaperRepository interface {
-	Add() (model.Paper, error)
+	Add(bookID string) (model.Paper, error)
 }

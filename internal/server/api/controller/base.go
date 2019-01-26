@@ -15,3 +15,8 @@ func responseJSON(w http.ResponseWriter, v interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(res)
 }
+
+func response404(w http.ResponseWriter, message string) {
+	w.WriteHeader(http.StatusNotFound)
+	w.Write([]byte(message))
+}

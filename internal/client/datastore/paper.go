@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -17,8 +18,8 @@ type PaperRepositoryImpl struct {
 }
 
 // Add adds a paper
-func (repo *PaperRepositoryImpl) Add() (model.Paper, error) {
-	u := fmt.Sprintf("http://localhost:%s/paper", repo.Port)
+func (repo *PaperRepositoryImpl) Add(bookID string) (model.Paper, error) {
+	u := fmt.Sprintf("http://localhost:%s/book/%s/paper", repo.Port, bookID)
 	res, err := http.PostForm(u, url.Values{})
 	if err != nil {
 		return nil, err
@@ -28,6 +29,10 @@ func (repo *PaperRepositoryImpl) Add() (model.Paper, error) {
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
+	}
+
+	if res.StatusCode == http.StatusNotFound {
+		return nil, errors.New(string(body))
 	}
 
 	var paper datastore.PaperImpl
