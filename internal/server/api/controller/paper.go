@@ -22,5 +22,6 @@ func (ctrl *PaperController) Add(w http.ResponseWriter, r *http.Request, params 
 		response404(w, fmt.Sprintf("Not Found book: %v", bookID))
 		return
 	}
+
 	responseJSON(w, paper)
 }

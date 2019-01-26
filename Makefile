@@ -4,7 +4,7 @@ build:
 start:
 	${MAKE} build
 	pkill -KILL -f "dist/qaper [s]erver" || echo "kill the old process"
-	./dist/qaper server
+	./dist/qaper server -config ./example/config.toml
 
 test:
 	go run main.go join -bookid=1

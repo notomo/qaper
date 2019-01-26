@@ -4,8 +4,8 @@ import "github.com/notomo/qaper/domain/model"
 
 // PaperImpl implements paper
 type PaperImpl struct {
-	PaperID   string     `json:"id"`
-	PaperBook model.Book `json:"book"`
+	PaperID   string    `json:"id"`
+	PaperBook *BookImpl `json:"book"`
 }
 
 // ID returns an id

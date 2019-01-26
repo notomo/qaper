@@ -4,6 +4,7 @@ import (
 	"github.com/notomo/qaper/domain/model"
 	"github.com/notomo/qaper/domain/repository"
 	"github.com/notomo/qaper/internal/datastore"
+	"github.com/rs/xid"
 )
 
 // PaperRepositoryImpl implements paper repository
@@ -19,7 +20,9 @@ func (repo *PaperRepositoryImpl) Add(bookID string) (model.Paper, error) {
 		return nil, err
 	}
 
-	paper := &datastore.PaperImpl{PaperID: "0", PaperBook: book}
+	bookImpl, _ := book.(*datastore.BookImpl)
+	paperID := xid.New().String()
+	paper := &datastore.PaperImpl{PaperID: paperID, PaperBook: bookImpl}
 	repo.Processor.AddPaper(paper)
 	return paper, nil
 }

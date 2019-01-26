@@ -40,6 +40,7 @@ func parseCommand(args []string, inputReader io.Reader, outputWriter io.Writer) 
 
 	serverFlag := flag.NewFlagSet("server", flag.ExitOnError)
 	serverPort := serverFlag.String("port", defaultPort, "port number")
+	configPath := serverFlag.String("config", "", "config file path")
 
 	if len(args) == 0 {
 		return &cmd.HelpCommand{OutputWriter: outputWriter}, nil
@@ -64,6 +65,7 @@ func parseCommand(args []string, inputReader io.Reader, outputWriter io.Writer) 
 		command = &cmd.ServerCommand{
 			OutputWriter: outputWriter,
 			Port:         *serverPort,
+			ConfigPath:   *configPath,
 			Processor:    processor,
 			PaperController: controller.PaperController{
 				PaperRepository: &server.PaperRepositoryImpl{

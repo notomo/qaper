@@ -1,7 +1,10 @@
 package datastore
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"log"
+	"path/filepath"
 
 	"github.com/notomo/qaper/domain/model"
 	"github.com/notomo/qaper/internal"
@@ -43,6 +46,30 @@ func NewProcessor() *Processor {
 	}
 }
 
+// LoadLibrary loads the library books
+func (processor *Processor) LoadLibrary(libraryPath string) error {
+	if libraryPath == "" {
+		return nil
+	}
+
+	abspath, err := filepath.Abs(libraryPath)
+	if err != nil {
+		return err
+	}
+
+	r, err := ioutil.ReadFile(abspath)
+	if err != nil {
+		return err
+	}
+
+	var library map[string]*datastore.BookImpl
+	if err := json.Unmarshal(r, &library); err != nil {
+		return err
+	}
+	processor.books = library
+	return nil
+}
+
 // Start process
 func (processor *Processor) Start() error {
 	for {
@@ -53,12 +80,8 @@ func (processor *Processor) Start() error {
 				log.Printf("addedPaper: %v\n", paper.ID())
 			}
 		case bookID := <-processor.gotBook:
-			book, ok := processor.books[bookID]
-			if !ok {
-				processor.book <- book
-			} else {
-				processor.book <- nil
-			}
+			book, _ := processor.books[bookID]
+			processor.book <- book
 		case <-processor.done:
 			log.Println("Done")
 			return nil
