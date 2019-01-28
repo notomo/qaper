@@ -55,6 +55,7 @@ func parseCommand(args []string, inputReader io.Reader, outputWriter io.Writer) 
 		command = &cmd.JoinCommand{
 			OutputWriter:    outputWriter,
 			PaperRepository: &client.PaperRepositoryImpl{Port: *joinPort},
+			StateRepository: &client.StateRepositoryImpl{},
 			BookID:          *bookID,
 		}
 	case "server":
