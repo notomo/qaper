@@ -16,6 +16,9 @@ type Processor struct {
 	addedPaper chan *datastore.PaperImpl
 	papers     map[string]*datastore.PaperImpl
 
+	gotPaper chan string
+	paper    chan *datastore.PaperImpl
+
 	gotBook chan string
 	book    chan *datastore.BookImpl
 	books   map[string]*datastore.BookImpl
@@ -28,6 +31,9 @@ func NewProcessor() *Processor {
 	addedPaper := make(chan *datastore.PaperImpl)
 	papers := make(map[string]*datastore.PaperImpl)
 
+	gotPaper := make(chan string)
+	paper := make(chan *datastore.PaperImpl)
+
 	gotBook := make(chan string)
 	book := make(chan *datastore.BookImpl)
 	books := make(map[string]*datastore.BookImpl)
@@ -37,6 +43,9 @@ func NewProcessor() *Processor {
 	return &Processor{
 		addedPaper: addedPaper,
 		papers:     papers,
+
+		gotPaper: gotPaper,
+		paper:    paper,
 
 		gotBook: gotBook,
 		book:    book,
@@ -82,6 +91,9 @@ func (processor *Processor) Start() error {
 		case bookID := <-processor.gotBook:
 			book, _ := processor.books[bookID]
 			processor.book <- book
+		case paperID := <-processor.gotPaper:
+			paper, _ := processor.papers[paperID]
+			processor.paper <- paper
 		case <-processor.done:
 			log.Println("Done")
 			return nil
@@ -94,7 +106,7 @@ func (processor *Processor) AddPaper(paper *datastore.PaperImpl) {
 	processor.addedPaper <- paper
 }
 
-// GetBook emmits an add paper event
+// GetBook emmits a get book event
 func (processor *Processor) GetBook(bookID string) (model.Book, error) {
 	go func() {
 		processor.gotBook <- bookID
@@ -105,4 +117,17 @@ func (processor *Processor) GetBook(bookID string) (model.Book, error) {
 		return nil, internal.ErrNotFound
 	}
 	return book, nil
+}
+
+// GetPaper emmits a get paper event
+func (processor *Processor) GetPaper(paperID string) (model.Paper, error) {
+	go func() {
+		processor.gotPaper <- paperID
+	}()
+
+	paper := <-processor.paper
+	if paper == nil {
+		return nil, internal.ErrNotFound
+	}
+	return paper, nil
 }

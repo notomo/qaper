@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/notomo/qaper/domain/model"
+	"github.com/notomo/qaper/internal"
 	"github.com/notomo/qaper/internal/datastore"
 )
 
@@ -41,4 +42,9 @@ func (repo *PaperRepositoryImpl) Add(bookID string) (model.Paper, error) {
 	}
 
 	return &paper, nil
+}
+
+// Get gets a paper
+func (repo *PaperRepositoryImpl) Get(paperID string) (model.Paper, error) {
+	return nil, internal.ErrNotImplemented
 }

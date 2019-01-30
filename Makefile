@@ -8,6 +8,7 @@ start:
 
 test:
 	go run main.go join -bookid=1
+	go run main.go question
 
 format:
 	go fmt $(go list ./... | grep -v /vendor/)

@@ -7,4 +7,5 @@ import (
 // StateRepository provides state operations.
 type StateRepository interface {
 	Save(paper model.Paper) error
+	Load() (string, error)
 }

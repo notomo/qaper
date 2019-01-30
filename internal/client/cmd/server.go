@@ -35,6 +35,7 @@ func (c *ServerCommand) Run() error {
 
 	router := httprouter.New()
 	router.POST("/book/:bookID/paper", c.PaperController.Add)
+	router.GET("/paper/:paperID/question", c.PaperController.GetCurrentQuestion)
 	server := &http.Server{
 		Addr:    ":" + serverConfig.Port,
 		Handler: router,

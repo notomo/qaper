@@ -26,3 +26,8 @@ func (repo *PaperRepositoryImpl) Add(bookID string) (model.Paper, error) {
 	repo.Processor.AddPaper(paper)
 	return paper, nil
 }
+
+// Get gets a paper
+func (repo *PaperRepositoryImpl) Get(paperID string) (model.Paper, error) {
+	return repo.Processor.GetPaper(paperID)
+}

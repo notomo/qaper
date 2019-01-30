@@ -38,6 +38,9 @@ func parseCommand(args []string, inputReader io.Reader, outputWriter io.Writer) 
 	joinPort := joinFlag.String("port", defaultPort, "port number")
 	bookID := joinFlag.String("bookid", "", "book id")
 
+	questionFlag := flag.NewFlagSet("question", flag.ExitOnError)
+	questionPort := questionFlag.String("port", defaultPort, "port number")
+
 	serverFlag := flag.NewFlagSet("server", flag.ExitOnError)
 	serverPort := serverFlag.String("port", defaultPort, "port number")
 	configPath := serverFlag.String("config", "", "config file path")
@@ -57,6 +60,15 @@ func parseCommand(args []string, inputReader io.Reader, outputWriter io.Writer) 
 			PaperRepository: &client.PaperRepositoryImpl{Port: *joinPort},
 			StateRepository: &client.StateRepositoryImpl{},
 			BookID:          *bookID,
+		}
+	case "question":
+		if err := questionFlag.Parse(args[1:]); err != nil {
+			return nil, err
+		}
+		command = &cmd.QuestionCommand{
+			OutputWriter:       outputWriter,
+			QuestionRepository: &client.QuestionRepositoryImpl{Port: *questionPort},
+			StateRepository:    &client.StateRepositoryImpl{},
 		}
 	case "server":
 		if err := serverFlag.Parse(args[1:]); err != nil {
