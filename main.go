@@ -10,6 +10,7 @@ import (
 	"github.com/notomo/qaper/internal/client/cmd"
 	"github.com/notomo/qaper/internal/client/cmd/config"
 	client "github.com/notomo/qaper/internal/client/datastore"
+	"github.com/notomo/qaper/internal/datastore"
 	"github.com/notomo/qaper/internal/server/api/controller"
 	server "github.com/notomo/qaper/internal/server/datastore"
 )
@@ -44,6 +45,9 @@ func run(args []string, conf *globalConfig, inputReader io.Reader, outputWriter 
 func parseCommand(args []string, conf *globalConfig, inputReader io.Reader, outputWriter io.Writer) (cmd.Command, error) {
 	joinFlag := flag.NewFlagSet("join", flag.ExitOnError)
 	bookID := joinFlag.String("bookid", "", "book id")
+
+	answerFlag := flag.NewFlagSet("answer", flag.ExitOnError)
+	answerBody := answerFlag.String("body", "", "answer body")
 
 	serverFlag := flag.NewFlagSet("server", flag.ExitOnError)
 	configPath := serverFlag.String("config", "", "config file path")
@@ -85,6 +89,24 @@ func parseCommand(args []string, conf *globalConfig, inputReader io.Reader, outp
 			QuestionRepository: &client.QuestionRepositoryImpl{Port: questionConfig.Port},
 			StateRepository:    &client.StateRepositoryImpl{},
 		}
+	case "answer":
+		if err := answerFlag.Parse(args[1:]); err != nil {
+			return nil, err
+		}
+
+		answerConfig, err := (&config.AnswerConfig{
+			Port: conf.port,
+		}).Load(*configPath)
+		if err != nil {
+			return nil, err
+		}
+
+		command = &cmd.AnswerCommand{
+			OutputWriter:     outputWriter,
+			AnswerRepository: &client.AnswerRepositoryImpl{Port: answerConfig.Port},
+			StateRepository:  &client.StateRepositoryImpl{},
+			Answer:           &datastore.AnswerImpl{AnswerBody: *answerBody},
+		}
 	case "server":
 		if err := serverFlag.Parse(args[1:]); err != nil {
 			return nil, err
@@ -110,6 +132,9 @@ func parseCommand(args []string, conf *globalConfig, inputReader io.Reader, outp
 					BookRepository: &server.BookRepositoryImpl{
 						Processor: processor,
 					},
+				},
+				AnswerRepository: &server.AnswerRepositoryImpl{
+					Processor: processor,
 				},
 			},
 		}

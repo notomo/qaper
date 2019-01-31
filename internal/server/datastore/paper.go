@@ -22,7 +22,12 @@ func (repo *PaperRepositoryImpl) Add(bookID string) (model.Paper, error) {
 
 	bookImpl, _ := book.(*datastore.BookImpl)
 	paperID := xid.New().String()
-	paper := &datastore.PaperImpl{PaperID: paperID, PaperBook: bookImpl}
+
+	paper := &datastore.PaperImpl{
+		PaperID:   paperID,
+		PaperBook: bookImpl,
+		Answers:   make([]*datastore.AnswerImpl, len(bookImpl.BookQuestions)),
+	}
 	repo.Processor.AddPaper(paper)
 	return paper, nil
 }

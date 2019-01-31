@@ -6,7 +6,7 @@ import (
 	"github.com/notomo/qaper/domain/repository"
 )
 
-// QuestionCommand represents `join` command
+// QuestionCommand represents `question` command
 type QuestionCommand struct {
 	OutputWriter       io.Writer
 	QuestionRepository repository.QuestionRepository

@@ -23,6 +23,9 @@ type Processor struct {
 	book    chan *datastore.BookImpl
 	books   map[string]*datastore.BookImpl
 
+	setAnswer   chan error
+	paperAnswer chan *paperAnswer
+
 	done chan bool
 }
 
@@ -38,6 +41,9 @@ func NewProcessor() *Processor {
 	book := make(chan *datastore.BookImpl)
 	books := make(map[string]*datastore.BookImpl)
 
+	setAnswer := make(chan error)
+	paperAnswer := make(chan *paperAnswer)
+
 	done := make(chan bool)
 
 	return &Processor{
@@ -50,6 +56,9 @@ func NewProcessor() *Processor {
 		gotBook: gotBook,
 		book:    book,
 		books:   books,
+
+		setAnswer:   setAnswer,
+		paperAnswer: paperAnswer,
 
 		done: done,
 	}
@@ -94,6 +103,9 @@ func (processor *Processor) Start() error {
 		case paperID := <-processor.gotPaper:
 			paper, _ := processor.papers[paperID]
 			processor.paper <- paper
+		case paperAnswer := <-processor.paperAnswer:
+			err := paperAnswer.paper.SetAnswer(paperAnswer.answer)
+			processor.setAnswer <- err
 		case <-processor.done:
 			log.Println("Done")
 			return nil
@@ -130,4 +142,23 @@ func (processor *Processor) GetPaper(paperID string) (model.Paper, error) {
 		return nil, internal.ErrNotFound
 	}
 	return paper, nil
+}
+
+type paperAnswer struct {
+	paper  model.Paper
+	answer model.Answer
+}
+
+// SetAnswer emmits a set answer event
+func (processor *Processor) SetAnswer(paperID string, answer model.Answer) error {
+	paper, err := processor.GetPaper(paperID)
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		processor.paperAnswer <- &paperAnswer{paper, answer}
+	}()
+
+	return <-processor.setAnswer
 }

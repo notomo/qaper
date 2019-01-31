@@ -4,4 +4,5 @@ package model
 type Paper interface {
 	ID() string
 	CurrentQuestion() Question
+	SetAnswer(answer Answer) error
 }

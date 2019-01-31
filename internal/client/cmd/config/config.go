@@ -10,6 +10,7 @@ type Config struct {
 	Server   ServerConfig
 	Join     JoinConfig
 	Question QuestionConfig
+	Answer   AnswerConfig
 }
 
 var defaultPort = "9090"
@@ -108,6 +109,38 @@ func (c *QuestionConfig) Load(configPath string) (*QuestionConfig, error) {
 }
 
 func (c *QuestionConfig) setDefault() *QuestionConfig {
+	if c.Port == "" {
+		c.Port = defaultPort
+	}
+	return c
+}
+
+// AnswerConfig configs `answer` command
+type AnswerConfig struct {
+	Port string
+}
+
+// Load the answer config
+func (c *AnswerConfig) Load(configPath string) (*AnswerConfig, error) {
+	if configPath == "" {
+		return c.setDefault(), nil
+	}
+
+	var conf Config
+	_, err := toml.DecodeFile(configPath, &conf)
+	if err != nil {
+		return nil, err
+	}
+
+	answerConfig := conf.Answer
+	if c.Port != "" {
+		answerConfig.Port = c.Port
+	}
+
+	return c.setDefault(), nil
+}
+
+func (c *AnswerConfig) setDefault() *AnswerConfig {
 	if c.Port == "" {
 		c.Port = defaultPort
 	}

@@ -25,7 +25,9 @@ type ServerCommand struct {
 func (c *ServerCommand) Run() error {
 	router := httprouter.New()
 	router.POST("/book/:bookID/paper", c.PaperController.Add)
+	router.GET("/paper/:paperID", c.PaperController.Get)
 	router.GET("/paper/:paperID/question", c.PaperController.GetCurrentQuestion)
+	router.POST("/paper/:paperID/answer", c.PaperController.SetAnswer)
 	server := &http.Server{
 		Addr:    ":" + c.Port,
 		Handler: router,

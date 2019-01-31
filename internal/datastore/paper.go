@@ -6,9 +6,10 @@ import (
 
 // PaperImpl implements paper
 type PaperImpl struct {
-	PaperID           string    `json:"id"`
-	PaperBook         *BookImpl `json:"book"`
-	PaperCurrentIndex int       `json:"currentIndex"`
+	PaperID           string        `json:"id"`
+	PaperBook         *BookImpl     `json:"book"`
+	PaperCurrentIndex int           `json:"currentIndex"`
+	Answers           []*AnswerImpl `json:"answers"`
 }
 
 // ID returns an id
@@ -23,4 +24,11 @@ func (p *PaperImpl) CurrentQuestion() model.Question {
 		return nil
 	}
 	return questions[p.PaperCurrentIndex]
+}
+
+// SetAnswer sets an answer
+func (p *PaperImpl) SetAnswer(answer model.Answer) error {
+	answerImpl, _ := answer.(*AnswerImpl)
+	p.Answers[p.PaperCurrentIndex] = answerImpl
+	return nil
 }

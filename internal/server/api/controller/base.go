@@ -20,3 +20,8 @@ func response404(w http.ResponseWriter, message string) {
 	w.WriteHeader(http.StatusNotFound)
 	w.Write([]byte(message))
 }
+
+func response400(w http.ResponseWriter, message string) {
+	w.WriteHeader(http.StatusBadRequest)
+	w.Write([]byte(message))
+}
