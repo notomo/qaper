@@ -1,3 +1,4 @@
-[server]
 port = "9090"
+
+[server]
 libraryPath = "./example/library.json"
