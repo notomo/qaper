@@ -1,20 +1,20 @@
 package controller
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/notomo/qaper/domain/model"
 	"github.com/notomo/qaper/domain/repository"
 	"github.com/notomo/qaper/internal"
-	"github.com/notomo/qaper/internal/datastore"
 )
 
 // PaperController responds to paper api
 type PaperController struct {
 	PaperRepository  repository.PaperRepository
 	AnswerRepository repository.AnswerRepository
+	AnswerDecoder    model.AnswerDecoder
 }
 
 // Add adds a paper
@@ -69,22 +69,20 @@ func (ctrl *PaperController) GetCurrentQuestion(w http.ResponseWriter, r *http.R
 
 // SetAnswer gets a current question
 func (ctrl *PaperController) SetAnswer(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	decoder := json.NewDecoder(r.Body)
-	// TODO: answer decoder interface
-	var answer datastore.AnswerImpl
-	if err := decoder.Decode(&answer); err != nil {
-		response400(w, fmt.Sprintf("json parse error"))
+	answer, err := ctrl.AnswerDecoder.Decode(r.Body)
+	if err != nil {
+		response400(w, err.Error())
 		return
 	}
 
 	paperID := params.ByName("paperID")
-	err := ctrl.AnswerRepository.Set(paperID, &answer)
-	if err == internal.ErrNotFound {
-		response404(w, fmt.Sprintf("Not Found paper: %v", paperID))
-		return
-	}
-	if err != nil {
-		response500(w, err.Error())
+	if err := ctrl.AnswerRepository.Set(paperID, answer); err != nil {
+		switch err {
+		case internal.ErrNotFound:
+			response404(w, fmt.Sprintf("Not Found paper: %v", paperID))
+		default:
+			response500(w, err.Error())
+		}
 		return
 	}
 

@@ -136,6 +136,7 @@ func parseCommand(args []string, conf *globalConfig, inputReader io.Reader, outp
 				AnswerRepository: &server.AnswerRepositoryImpl{
 					Processor: processor,
 				},
+				AnswerDecoder: &datastore.AnswerJSONDecoder{},
 			},
 		}
 	default:
