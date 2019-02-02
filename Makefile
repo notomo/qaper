@@ -7,9 +7,10 @@ start:
 	./dist/qaper server -config ./example/config.toml
 
 test:
-	go run main.go join -bookid=1
-	go run main.go question
-	go run main.go answer -body=answer1
+	${MAKE} build
+	./dist/qaper join -bookid=1
+	./dist/qaper question
+	./dist/qaper answer -body=answer1
 
 format:
 	go fmt $(go list ./... | grep -v /vendor/)

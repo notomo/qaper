@@ -10,10 +10,13 @@ import (
 	"github.com/notomo/qaper/internal/client/cmd"
 	"github.com/notomo/qaper/internal/client/cmd/config"
 	client "github.com/notomo/qaper/internal/client/datastore"
+	"github.com/notomo/qaper/internal/client/datastore/httpc"
 	"github.com/notomo/qaper/internal/datastore"
 	"github.com/notomo/qaper/internal/server/api/controller"
 	server "github.com/notomo/qaper/internal/server/datastore"
 )
+
+var domain = "localhost"
 
 type globalConfig struct {
 	port string
@@ -71,8 +74,13 @@ func parseCommand(args []string, conf *globalConfig, inputReader io.Reader, outp
 		}
 
 		command = &cmd.JoinCommand{
-			OutputWriter:    outputWriter,
-			PaperRepository: &client.PaperRepositoryImpl{Port: joinConfig.Port},
+			OutputWriter: outputWriter,
+			PaperRepository: &client.PaperRepositoryImpl{
+				Client: &httpc.Client{
+					Port:   joinConfig.Port,
+					Domain: domain,
+				},
+			},
 			StateRepository: &client.StateRepositoryImpl{},
 			BookID:          *bookID,
 		}
@@ -85,9 +93,14 @@ func parseCommand(args []string, conf *globalConfig, inputReader io.Reader, outp
 		}
 
 		command = &cmd.QuestionCommand{
-			OutputWriter:       outputWriter,
-			QuestionRepository: &client.QuestionRepositoryImpl{Port: questionConfig.Port},
-			StateRepository:    &client.StateRepositoryImpl{},
+			OutputWriter: outputWriter,
+			QuestionRepository: &client.QuestionRepositoryImpl{
+				Client: &httpc.Client{
+					Port:   questionConfig.Port,
+					Domain: domain,
+				},
+			},
+			StateRepository: &client.StateRepositoryImpl{},
 		}
 	case "answer":
 		if err := answerFlag.Parse(args[1:]); err != nil {
@@ -102,10 +115,15 @@ func parseCommand(args []string, conf *globalConfig, inputReader io.Reader, outp
 		}
 
 		command = &cmd.AnswerCommand{
-			OutputWriter:     outputWriter,
-			AnswerRepository: &client.AnswerRepositoryImpl{Port: answerConfig.Port},
-			StateRepository:  &client.StateRepositoryImpl{},
-			Answer:           &datastore.AnswerImpl{AnswerBody: *answerBody},
+			OutputWriter: outputWriter,
+			AnswerRepository: &client.AnswerRepositoryImpl{
+				Client: &httpc.Client{
+					Port:   answerConfig.Port,
+					Domain: domain,
+				},
+			},
+			StateRepository: &client.StateRepositoryImpl{},
+			Answer:          &datastore.AnswerImpl{AnswerBody: *answerBody},
 		}
 	case "server":
 		if err := serverFlag.Parse(args[1:]); err != nil {

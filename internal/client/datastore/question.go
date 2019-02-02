@@ -4,28 +4,22 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/notomo/qaper/domain/model"
+	"github.com/notomo/qaper/internal/client/datastore/httpc"
 	"github.com/notomo/qaper/internal/datastore"
 )
 
 // QuestionRepositoryImpl implements question repository
 type QuestionRepositoryImpl struct {
-	Port string
+	Client *httpc.Client
 }
 
 // GetCurrent gets the current question
 func (repo *QuestionRepositoryImpl) GetCurrent(paperID string) (model.Question, error) {
-	u := fmt.Sprintf("http://localhost:%s/paper/%s/question", repo.Port, paperID)
-	res, err := http.Get(u)
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	path := fmt.Sprintf("/paper/%s/question", paperID)
+	res, body, err := repo.Client.Get(path)
 	if err != nil {
 		return nil, err
 	}

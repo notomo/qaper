@@ -4,30 +4,23 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"net/url"
 
 	"github.com/notomo/qaper/domain/model"
 	"github.com/notomo/qaper/internal"
+	"github.com/notomo/qaper/internal/client/datastore/httpc"
 	"github.com/notomo/qaper/internal/datastore"
 )
 
 // PaperRepositoryImpl implements paper repository
 type PaperRepositoryImpl struct {
-	Port string
+	Client *httpc.Client
 }
 
 // Add adds a paper
 func (repo *PaperRepositoryImpl) Add(bookID string) (model.Paper, error) {
-	u := fmt.Sprintf("http://localhost:%s/book/%s/paper", repo.Port, bookID)
-	res, err := http.PostForm(u, url.Values{})
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	path := fmt.Sprintf("/book/%s/paper", bookID)
+	res, body, err := repo.Client.Post(path, "")
 	if err != nil {
 		return nil, err
 	}
