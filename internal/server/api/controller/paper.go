@@ -21,12 +21,13 @@ type PaperController struct {
 func (ctrl *PaperController) Add(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	bookID := params.ByName("bookID")
 	paper, err := ctrl.PaperRepository.Add(bookID)
-	if err == internal.ErrNotFound {
-		response404(w, fmt.Sprintf("Not Found book: %v", bookID))
-		return
-	}
 	if err != nil {
-		response500(w, err.Error())
+		switch err {
+		case internal.ErrNotFound:
+			response404(w, fmt.Sprintf("Not Found book: %v", bookID))
+		default:
+			response500(w, err.Error())
+		}
 		return
 	}
 
@@ -37,12 +38,13 @@ func (ctrl *PaperController) Add(w http.ResponseWriter, r *http.Request, params 
 func (ctrl *PaperController) Get(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	paperID := params.ByName("paperID")
 	paper, err := ctrl.PaperRepository.Get(paperID)
-	if err == internal.ErrNotFound {
-		response404(w, fmt.Sprintf("Not Found paper: %v", paperID))
-		return
-	}
 	if err != nil {
-		response500(w, err.Error())
+		switch err {
+		case internal.ErrNotFound:
+			response404(w, fmt.Sprintf("Not Found paper: %v", paperID))
+		default:
+			response500(w, err.Error())
+		}
 		return
 	}
 
@@ -53,8 +55,13 @@ func (ctrl *PaperController) Get(w http.ResponseWriter, r *http.Request, params 
 func (ctrl *PaperController) GetCurrentQuestion(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	paperID := params.ByName("paperID")
 	paper, err := ctrl.PaperRepository.Get(paperID)
-	if err == internal.ErrNotFound {
-		response404(w, fmt.Sprintf("Not Found paper: %v", paperID))
+	if err != nil {
+		switch err {
+		case internal.ErrNotFound:
+			response404(w, fmt.Sprintf("Not Found paper: %v", paperID))
+		default:
+			response500(w, err.Error())
+		}
 		return
 	}
 
