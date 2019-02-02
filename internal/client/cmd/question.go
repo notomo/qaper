@@ -15,12 +15,12 @@ type QuestionCommand struct {
 
 // Run `question` command
 func (c *QuestionCommand) Run() error {
-	paperID, err := c.StateRepository.Load()
+	state, err := c.StateRepository.Load()
 	if err != nil {
 		return err
 	}
 
-	question, err := c.QuestionRepository.GetCurrent(paperID)
+	question, err := c.QuestionRepository.GetCurrent(state.PaperID())
 	if err != nil {
 		return err
 	}

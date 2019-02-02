@@ -17,12 +17,12 @@ type AnswerCommand struct {
 
 // Run `answer` command
 func (c *AnswerCommand) Run() error {
-	paperID, err := c.StateRepository.Load()
+	state, err := c.StateRepository.Load()
 	if err != nil {
 		return err
 	}
 
-	if err := c.AnswerRepository.Set(paperID, c.Answer); err != nil {
+	if err := c.AnswerRepository.Set(state.PaperID(), c.Answer); err != nil {
 		return err
 	}
 

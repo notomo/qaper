@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/notomo/qaper/domain/model"
+	"github.com/notomo/qaper/internal/datastore"
 )
 
 // StateRepositoryImpl implements state repository
@@ -17,32 +18,32 @@ var fileName = "qaper"
 
 // Save state
 func (repo *StateRepositoryImpl) Save(paper model.Paper) error {
-	state := map[string]string{"id": paper.ID()}
+	// TODO: get the file lock
+
+	state := &datastore.StateImpl{StatePaperID: paper.ID()}
 	content, err := json.Marshal(state)
 	if err != nil {
 		return err
 	}
 
-	path := getFilePath()
-	return ioutil.WriteFile(path, content, os.FileMode(0600))
+	return ioutil.WriteFile(filePath(), content, os.FileMode(0600))
 }
 
 // Load state
-func (repo *StateRepositoryImpl) Load() (string, error) {
-	path := getFilePath()
-	file, err := ioutil.ReadFile(path)
+func (repo *StateRepositoryImpl) Load() (model.State, error) {
+	content, err := ioutil.ReadFile(filePath())
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	var content map[string]string
-	if err := json.Unmarshal(file, &content); err != nil {
-		return "", err
+	var state datastore.StateImpl
+	if err := json.Unmarshal(content, &state); err != nil {
+		return nil, err
 	}
 
-	return content["id"], nil
+	return &state, nil
 }
 
-func getFilePath() string {
+func filePath() string {
 	return filepath.Join(os.TempDir(), fileName)
 }
