@@ -42,7 +42,7 @@ func (repo *AnswerRepositoryImpl) Set(paperID string, answer model.Answer) error
 		return err
 	}
 
-	if res.StatusCode == http.StatusNotFound {
+	if res.StatusCode != http.StatusOK {
 		return errors.New(string(body))
 	}
 

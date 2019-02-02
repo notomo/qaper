@@ -32,7 +32,7 @@ func (repo *PaperRepositoryImpl) Add(bookID string) (model.Paper, error) {
 		return nil, err
 	}
 
-	if res.StatusCode == http.StatusNotFound {
+	if res.StatusCode != http.StatusOK {
 		return nil, errors.New(string(body))
 	}
 

@@ -30,7 +30,7 @@ func (repo *QuestionRepositoryImpl) GetCurrent(paperID string) (model.Question, 
 		return nil, err
 	}
 
-	if res.StatusCode == http.StatusNotFound {
+	if res.StatusCode != http.StatusOK {
 		return nil, errors.New(string(body))
 	}
 

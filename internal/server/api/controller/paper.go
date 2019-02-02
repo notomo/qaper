@@ -25,6 +25,10 @@ func (ctrl *PaperController) Add(w http.ResponseWriter, r *http.Request, params 
 		response404(w, fmt.Sprintf("Not Found book: %v", bookID))
 		return
 	}
+	if err != nil {
+		response500(w, err.Error())
+		return
+	}
 
 	responseJSON(w, paper)
 }
@@ -35,6 +39,10 @@ func (ctrl *PaperController) Get(w http.ResponseWriter, r *http.Request, params 
 	paper, err := ctrl.PaperRepository.Get(paperID)
 	if err == internal.ErrNotFound {
 		response404(w, fmt.Sprintf("Not Found paper: %v", paperID))
+		return
+	}
+	if err != nil {
+		response500(w, err.Error())
 		return
 	}
 
@@ -73,6 +81,10 @@ func (ctrl *PaperController) SetAnswer(w http.ResponseWriter, r *http.Request, p
 	err := ctrl.AnswerRepository.Set(paperID, &answer)
 	if err == internal.ErrNotFound {
 		response404(w, fmt.Sprintf("Not Found paper: %v", paperID))
+		return
+	}
+	if err != nil {
+		response500(w, err.Error())
 		return
 	}
 
