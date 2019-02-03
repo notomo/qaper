@@ -3,8 +3,8 @@ build:
 
 start:
 	${MAKE} build
-	pkill -KILL -f "dist/qaper [s]erver" || echo "kill the old process"
-	./dist/qaper server -config ./example/config.toml
+	pkill -KILL -f "dist/qaper -config ./example/config.toml [s]erver" || echo "kill the old process"
+	./dist/qaper -config ./example/config.toml server
 
 test:
 	${MAKE} build
