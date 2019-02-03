@@ -4,13 +4,14 @@ import (
 	"io"
 
 	"github.com/notomo/qaper/domain/repository"
+	crepository "github.com/notomo/qaper/internal/client/repository"
 )
 
 // QuestionCommand represents `question` command
 type QuestionCommand struct {
 	OutputWriter       io.Writer
 	QuestionRepository repository.QuestionRepository
-	StateRepository    repository.StateRepository
+	StateRepository    crepository.StateRepository
 }
 
 // Run `question` command

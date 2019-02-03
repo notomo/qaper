@@ -4,13 +4,14 @@ import (
 	"io"
 
 	"github.com/notomo/qaper/domain/repository"
+	crepository "github.com/notomo/qaper/internal/client/repository"
 )
 
 // JoinCommand represents `join` command
 type JoinCommand struct {
 	OutputWriter    io.Writer
 	PaperRepository repository.PaperRepository
-	StateRepository repository.StateRepository
+	StateRepository crepository.StateRepository
 	BookID          string
 }
 

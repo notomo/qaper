@@ -5,12 +5,13 @@ import (
 
 	"github.com/notomo/qaper/domain/model"
 	"github.com/notomo/qaper/domain/repository"
+	crepository "github.com/notomo/qaper/internal/client/repository"
 )
 
 // AnswerCommand represents `answer` command
 type AnswerCommand struct {
 	OutputWriter     io.Writer
-	StateRepository  repository.StateRepository
+	StateRepository  crepository.StateRepository
 	AnswerRepository repository.AnswerRepository
 	Answer           model.Answer
 }
